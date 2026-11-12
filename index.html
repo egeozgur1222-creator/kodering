@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEGEAN CORE // EGE SUNAR</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Fira+Code:wght@400;500;600;700&family=Orbitron:wght@600;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #020306;
+            color: #e2e8f0;
+            font-family: 'Fira Code', monospace;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+        }
+
+        /* =========================================
+           1. BÖLÜM: KODER GİRİŞ EKRANI (WELCOME)
+           ========================================= */
+        #intro-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: radial-gradient(circle at center, #07111a 0%, #020306 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        #intro-screen.fade-out {
+            opacity: 0;
+            transform: scale(1.06);
+            pointer-events: none;
+        }
+
+        #cyber-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        #intro-screen::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.22),
+                rgba(0, 0, 0, 0.22) 2px,
+                transparent 2px,
+                transparent 4px
+            );
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .hero-terminal {
+            position: relative;
+            z-index: 3;
+            max-width: 920px;
+            width: 95%;
+            background: rgba(5, 9, 16, 0.78);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(0, 255, 170, 0.35);
+            border-radius: 16px;
+            padding: 42px 32px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0, 255, 170, 0.14), inset 0 0 30px rgba(0, 180, 255, 0.08);
+            animation: heroAppear 1s ease;
+        }
+
+        @keyframes heroAppear {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .terminal-top-tag {
+            display: inline-block;
+            font-size: 0.8rem;
+            color: #00ffaa;
+            background: rgba(0, 255, 170, 0.1);
+            border: 1px solid rgba(0, 255, 170, 0.35);
+            padding: 6px 16px;
+            border-radius: 20px;
+            letter-spacing: 3px;
+            margin-bottom: 24px;
+        }
+
+        .welcome-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.8rem, 4.5vw, 3.5rem);
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.25;
+            letter-spacing: 3px;
+            margin-bottom: 18px;
+            text-shadow: 
+                0 0 12px rgba(255, 255, 255, 0.7),
+                0 0 30px #00ffaa,
+                0 0 65px #00b8ff;
+        }
+
+        .welcome-title span {
+            background: linear-gradient(90deg, #00ffaa, #00f0ff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            filter: drop-shadow(0 0 18px rgba(0, 255, 170, 0.5));
+        }
+
+        .typing-subtitle {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            min-height: 24px;
+            margin-bottom: 34px;
+            letter-spacing: 1px;
+        }
+
+        .typing-cursor {
+            color: #00ffaa;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        #enter-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 170, 0.16), rgba(0, 180, 255, 0.16));
+            border: 1px solid #00ffaa;
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            padding: 18px 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(0, 255, 170, 0.35), inset 0 0 15px rgba(0, 255, 170, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        #enter-btn:hover {
+            background: #00ffaa;
+            color: #020306;
+            box-shadow: 0 0 45px #00ffaa;
+            transform: scale(1.05);
+        }
+
+        .shortcut-hint {
+            margin-top: 14px;
+            font-size: 0.75rem;
+            color: #64748b;
+            letter-spacing: 1.5px;
+        }
+
+        /* =========================================
+           "EGE SUNAR" GLITCH GEÇİŞ EKRANI
+           ========================================= */
+        #ege-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: #020306;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            overflow: hidden;
+        }
+
+        #ege-splash.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .splash-terminal-box {
+            position: relative;
+            z-index: 3;
+            width: 90%;
+            max-width: 720px;
+            background: rgba(5, 8, 14, 0.92);
+            border: 1px solid rgba(0, 255, 170, 0.45);
+            border-radius: 12px;
+            padding: 32px 28px;
+            box-shadow: 0 0 50px rgba(0, 255, 170, 0.2);
+            text-align: center;
+        }
+
+        .boot-logs {
+            text-align: left;
+            font-size: 0.78rem;
+            color: #00ffaa;
+            margin-bottom: 20px;
+            min-height: 68px;
+            line-height: 1.5;
+            border-left: 2px solid #00ffaa;
+            padding-left: 12px;
+        }
+
+        .coder-present-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.4rem, 6vw, 4.6rem);
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 8px;
+            position: relative;
+            display: inline-block;
+            margin: 10px 0 18px 0;
+            text-shadow: 0 0 10px #00ffaa, 0 0 30px #00ffaa, 0 0 60px #00b8ff;
+            animation: glitchSkew 1.5s infinite linear alternate-reverse;
+        }
+
+        .coder-present-title::before,
+        .coder-present-title::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .coder-present-title::before {
+            left: 3px;
+            text-shadow: -2px 0 #ff0055;
+            clip-path: inset(20% 0 50% 0);
+            animation: glitchAnim1 0.8s infinite linear alternate-reverse;
+        }
+
+        .coder-present-title::after {
+            left: -3px;
+            text-shadow: 2px 0 #00f0ff;
+            clip-path: inset(60% 0 10% 0);
+            animation: glitchAnim2 0.6s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitchAnim1 {
+            0% { clip-path: inset(10% 0 70% 0); }
+            50% { clip-path: inset(45% 0 20% 0); }
+            100% { clip-path: inset(75% 0 5% 0); }
+        }
+
+        @keyframes glitchAnim2 {
+            0% { clip-path: inset(65% 0 10% 0); }
+            50% { clip-path: inset(15% 0 55% 0); }
+            100% { clip-path: inset(35% 0 30% 0); }
+        }
+
+        @keyframes glitchSkew {
+            0%, 60%, 100% { transform: skew(0deg); }
+            20% { transform: skew(-1deg); }
+            40% { transform: skew(1deg); }
+        }
+
+        .splash-code-tag {
+            font-size: 0.9rem;
+            color: #38bdf8;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        .splash-loader {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+        }
+
+        .splash-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00ffaa, #00b8ff, #a855f7);
+            box-shadow: 0 0 15px #00ffaa;
+            transition: width 2.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* =========================================
+           2. BÖLÜM: ANA KODLAMA AKADEMİSİ + YAN ASİSTAN
+           ========================================= */
+        #main-app {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+        }
+
+        #main-app.active {
+            display: flex;
+        }
+
+        #matrix-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            opacity: 0.42;
+        }
+
+        .top-navbar {
+            position: relative;
+            z-index: 15;
+            height: 58px;
+            background: rgba(8, 10, 15, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 255, 170, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: #00ffaa;
+            letter-spacing: 2px;
+            text-shadow: 0 0 12px rgba(0, 255, 170, 0.6);
+        }
+
+        .logo span { color: #fff; }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* ASİSTANA BAĞLAN BUTONU */
+        #connectAssistantBtn {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.25));
+            border: 1px solid #00f0ff;
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 18px rgba(0, 240, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        #connectAssistantBtn:hover, #connectAssistantBtn.connected {
+            background: #00f0ff;
+            color: #020306;
+            box-shadow: 0 0 28px #00f0ff;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ffaa;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ffaa;
+            animation: pulseAnim 1.4s infinite;
+        }
+
+        @keyframes pulseAnim {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.5; }
+        }
+
+        .sys-info { font-size: 0.78rem; color: #00ffaa; }
+
+        /* Ana Çalışma Alanı (Akademi + Yan Asistan Yan Yana) */
+        .workspace {
+            position: relative;
+            z-index: 5;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 16px;
+            padding: 16px 20px;
+            overflow: hidden;
+        }
+
+        .academy-view {
+            flex: 1;
+            height: 100%;
+            background: rgba(7, 10, 16, 0.9);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(0, 255, 170, 0.38);
+            border-radius: 14px;
+            padding: 18px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.92);
+            transition: all 0.35s ease;
+        }
+
+        .academy-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .lang-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #94a3b8;
+            padding: 7px 15px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            background: rgba(0, 255, 170, 0.18);
+            border-color: #00ffaa;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.25);
+        }
+
+        .xp-badge {
+            background: rgba(168, 85, 247, 0.2);
+            border: 1px solid #a855f7;
+            color: #e9d5ff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+        }
+
+        .step-progress-bar { display: flex; align-items: center; gap: 8px; }
+        .step-pill { flex: 1; height: 6px; border-radius: 4px; background: rgba(255, 255, 255, 0.1); transition: 0.3s; }
+        .step-pill.done { background: #00ffaa; box-shadow: 0 0 10px #00ffaa; }
+        .step-pill.current { background: #38bdf8; box-shadow: 0 0 10px #38bdf8; }
+
+        .academy-body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 18px;
+            overflow: hidden;
+        }
+
+        .lesson-card {
+            background: rgba(4, 6, 10, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
+
+        .step-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .step-indicator { color: #38bdf8; font-size: 0.78rem; letter-spacing: 2px; font-weight: 700; }
+
+        .status-tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: rgba(255, 189, 46, 0.15);
+            border: 1px solid #ffbd2e;
+            color: #ffbd2e;
+        }
+        .status-tag.completed {
+            background: rgba(0, 255, 170, 0.15);
+            border-color: #00ffaa;
+            color: #00ffaa;
+        }
+
+        .lesson-title { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #fff; margin-bottom: 10px; }
+        .lesson-desc { font-size: 0.88rem; line-height: 1.6; color: #cbd5e1; margin-bottom: 14px; }
+
+        .mission-box {
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .mission-title { font-family: 'Orbitron', sans-serif; font-size: 0.78rem; color: #38bdf8; margin-bottom: 5px; letter-spacing: 1px; }
+        .mission-text { font-size: 0.84rem; color: #f1f5f9; line-height: 1.5; }
+
+        .lesson-tip {
+            background: rgba(0, 255, 170, 0.06);
+            border-left: 3px solid #00ffaa;
+            padding: 10px 12px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.8rem;
+            color: #a7f3d0;
+        }
+
+        .step-nav { display: flex; justify-content: space-between; margin-top: 14px; gap: 10px; }
+
+        .step-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .step-btn:hover:not(:disabled) { background: #00ffaa; color: #000; border-color: #00ffaa; }
+        .step-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .code-playground {
+            background: #04060a;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-bar {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 9px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.78rem;
+            color: #94a3b8;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .editor-actions { display: flex; gap: 6px; }
+
+        .helper-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #cbd5e1;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.74rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .helper-btn:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
+
+        .run-code-btn {
+            background: #00ffaa;
+            color: #000;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .run-code-btn:hover { transform: scale(1.04); box-shadow: 0 0 15px #00ffaa; }
+
+        #codeEditorArea {
+            flex: 1;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #38bdf8;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.94rem;
+            line-height: 1.6;
+            padding: 14px;
+            resize: none;
+            outline: none;
+            user-select: text;
+        }
+
+        .console-output {
+            height: 140px;
+            background: #020305;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 10px 14px;
+            font-size: 0.84rem;
+            color: #00ffaa;
+            overflow-y: auto;
+        }
+
+        .console-label { font-size: 0.7rem; color: #64748b; margin-bottom: 5px; display: block; }
+        #consoleResult { white-space: pre-wrap; line-height: 1.45; }
+
+        /* =========================================
+           YAN TARAF: EGE'NİN AI ASİSTAN PANELİ
+           ========================================= */
+        .assistant-sidebar {
+            width: 370px;
+            height: 100%;
+            background: rgba(6, 10, 18, 0.94);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 240, 255, 0.45);
+            border-radius: 14px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 0 45px rgba(0, 240, 255, 0.18);
+            overflow: hidden;
+            animation: slideInRight 0.35s ease;
+        }
+
+        .assistant-sidebar.open {
+            display: flex;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .assistant-header {
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.15), rgba(168, 85, 247, 0.15));
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .assistant-identity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #00f0ff 0%, #0284c7 70%);
+            box-shadow: 0 0 15px #00f0ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .ai-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .ai-status {
+            font-size: 0.7rem;
+            color: #00ffaa;
+        }
+
+        .close-ai-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #cbd5e1;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .close-ai-btn:hover { background: #ff3250; color: #fff; border-color: #ff3250; }
+
+        .ai-chat-body {
+            flex: 1;
+            padding: 14px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            user-select: text;
+        }
+
+        .ai-chat-body::-webkit-scrollbar { width: 4px; }
+        .ai-chat-body::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.35); border-radius: 4px; }
+
+        .msg-bubble {
+            max-width: 88%;
+            padding: 10px 13px;
+            border-radius: 12px;
+            font-size: 0.83rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .msg-bubble.bot {
+            align-self: flex-start;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            color: #f1f5f9;
+            border-bottom-left-radius: 2px;
+        }
+
+        .msg-bubble.user {
+            align-self: flex-end;
+            background: rgba(0, 255, 170, 0.16);
+            border: 1px solid rgba(0, 255, 170, 0.4);
+            color: #fff;
+            border-bottom-right-radius: 2px;
+        }
+
+        .quick-prompts {
+            padding: 8px 12px;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .quick-chip {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            color: #7dd3fc;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 0.72rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .quick-chip:hover { background: rgba(0, 240, 255, 0.2); color: #fff; }
+
+        .ai-input-area {
+            padding: 10px 12px;
+            background: rgba(3, 5, 10, 0.95);
+            border-top: 1px solid rgba(0, 240, 255, 0.25);
+            display: flex;
+            gap: 8px;
+        }
+
+        #aiUserInput {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.82rem;
+            outline: none;
+            user-select: text;
+        }
+        #aiUserInput:focus { border-color: #00f0ff; box-shadow: 0 0 10px rgba(0, 240, 255, 0.25); }
+
+        #aiSendBtn {
+            background: #00f0ff;
+            color: #020306;
+            border: none;
+            padding: 0 14px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        #aiSendBtn:hover { box-shadow: 0 0 15px #00f0ff; transform: scale(1.03); }
+
+        @media (max-width: 950px) {
+            .workspace { flex-direction: column; overflow-y: auto; }
+            .academy-body { grid-template-columns: 1fr; }
+            .assistant-sidebar { width: 100%; height: 380px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =========================================
+         1. BÖLÜM: KODER GİRİŞ EKRANI
+         ========================================= -->
+    <div id="intro-screen">
+        <canvas id="cyber-canvas"></canvas>
+
+        <div class="hero-terminal">
+            <div class="terminal-top-tag">[ SYSTEM_READY // AEGEAN_ARCHITECT ]</div>
+            <h1 class="welcome-title">
+                Welcome to the <span>imagination of the Aegean</span>
+            </h1>
+            <div class="typing-subtitle">
+                <span id="typedSubtitle"></span><span class="typing-cursor">_</span>
+            </div>
+            <button id="enter-btn">SİSTEMİ BAŞLAT &gt;_</button>
+            <div class="shortcut-hint">[ PRESS ENTER OR CLICK TO INITIALIZE ]</div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         "EGE SUNAR" SİNEMATİK GLITCH GEÇİŞ EKRANI
+         ========================================= -->
+    <div id="ege-splash">
+        <div class="splash-terminal-box">
+            <div class="boot-logs" id="bootLogs"></div>
+            <div class="coder-present-title" data-text="EGE SUNAR">EGE SUNAR</div>
+            <div class="splash-code-tag">&lt;CODER_ACADEMY // v3.0_KERNEL&gt;</div>
+            <div class="splash-loader">
+                <div class="splash-bar" id="splashBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================
+         2. BÖLÜM: KOD ÖĞRENME PLATFORMU + YAN ASİSTAN
+         ========================================= -->
+    <div id="main-app">
+        <canvas id="matrix-bg"></canvas>
+
+        <header class="top-navbar">
+            <div class="logo">AEGEAN<span>//</span>CODE</div>
+
+            <div class="nav-right">
+                <div class="sys-info" id="clock">SYS: ONLINE</div>
+                <button id="connectAssistantBtn">
+                    <span class="pulse-dot"></span>
+                    <span>ASİSTANA BAĞLAN</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="workspace">
+            <!-- SOL / ANA KOD ÖĞRENME ALANI -->
+            <div class="academy-view">
+                <div class="academy-top">
+                    <div class="lang-tabs" id="langTabs">
+                        <button class="lang-btn active" data-lang="python">🐍 Python</button>
+                        <button class="lang-btn" data-lang="javascript">⚡ JavaScript</button>
+                        <button class="lang-btn" data-lang="html">🌐 HTML / CSS</button>
+                        <button class="lang-btn" data-lang="cpp">⚙️ C++</button>
+                    </div>
+
+                    <div class="xp-badge" id="xpBadge">⚡ XP: 0</div>
+                </div>
+
+                <div class="step-progress-bar" id="stepProgressBar"></div>
+
+                <div class="academy-body">
+                    <div class="lesson-card">
+                        <div>
+                            <div class="step-header-row">
+                                <span class="step-indicator" id="stepIndicator">ADIM 1 / 5</span>
+                                <span class="status-tag" id="stepStatusTag">GÖREV BEKLENİYOR</span>
+                            </div>
+                            <h2 class="lesson-title" id="lessonTitle">Başlık</h2>
+                            <p class="lesson-desc" id="lessonDesc">Açıklama...</p>
+
+                            <div class="mission-box">
+                                <div class="mission-title">&gt;_ SENİN GÖREVİN:</div>
+                                <div class="mission-text" id="missionText">Görev açıklaması...</div>
+                            </div>
+
+                            <div class="lesson-tip" id="lessonTip">İpucu...</div>
+                        </div>
+
+                        <div class="step-nav">
+                            <button class="step-btn" id="prevStepBtn">← Önceki</button>
+                            <button class="step-btn" id="nextStepBtn">Sonraki Adım →</button>
+                        </div>
+                    </div>
+
+                    <div class="code-playground">
+                        <div class="editor-bar">
+                            <span id="editorFileName">ege_ders.py</span>
+                            <div class="editor-actions">
+                                <button class="helper-btn" id="resetCodeBtn" title="Kodu Sıfırla">↺ Sıfırla</button>
+                                <button class="helper-btn" id="solveCodeBtn" title="Örnek Çözümü Göster">💡 Çözümü Yaz</button>
+                                <button class="run-code-btn" id="runCodeBtn">▶ ÇALIŞTIR &amp; KONTROL ET</button>
+                            </div>
+                        </div>
+                        <textarea id="codeEditorArea" spellcheck="false"></textarea>
+                        <div class="console-output">
+                            <span class="console-label">&gt;_ TERMİNAL ÇIKTISI &amp; DOĞRULAMA:</span>
+                            <pre id="consoleResult">Görevi tamamla ve 'ÇALIŞTIR & KONTROL ET' butonuna bas...</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAĞ TARAF: EGE'NİN AI ASİSTANI -->
+            <aside class="assistant-sidebar" id="assistantSidebar">
+                <div class="assistant-header">
+                    <div class="assistant-identity">
+                        <div class="ai-avatar">AI</div>
+                        <div>
+                            <div class="ai-name">EGE AI ASİSTAN</div>
+                            <div class="ai-status">● Çevrimiçi // Neural Link Aktif</div>
+                        </div>
+                    </div>
+                    <button class="close-ai-btn" id="closeAssistantBtn" title="Kapat">✕</button>
+                </div>
+
+                <div class="ai-chat-body" id="aiChatBody"></div>
+
+                <div class="quick-prompts">
+                    <button class="quick-chip" data-q="Bu adımdaki görevi nasıl yaparım?">💡 Bu göreve yardım et</button>
+                    <button class="quick-chip" data-q="Python nedir?">🐍 Python nedir?</button>
+                    <button class="quick-chip" data-q="125 * 48 kaç eder?">🧮 Matematik sor</button>
+                    <button class="quick-chip" data-q="Sen kimsin?">🤖 Sen kimsin?</button>
+                </div>
+
+                <div class="ai-input-area">
+                    <input type="text" id="aiUserInput" placeholder="Asistana bir şey sor..." autocomplete="off">
+                    <button id="aiSendBtn">SOR</button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        /* =========================================================
+           1. BÖLÜM SCRIPT: KODER GİRİŞ EKRANI (SİBER PARÇACIK AĞI)
+           ========================================================= */
+        const introScreen = document.getElementById('intro-screen');
+        const cyberCanvas = document.getElementById('cyber-canvas');
+        const cCtx = cyberCanvas.getContext('2d');
+        const enterBtn = document.getElementById('enter-btn');
+        const typedSubtitle = document.getElementById('typedSubtitle');
+
+        let cWidth = cyberCanvas.width = window.innerWidth;
+        let cHeight = cyberCanvas.height = window.innerHeight;
+        let introActive = true;
+
+        const subText = "Initializing neural dev environment // Select your language & build the future...";
+        let charIdx = 0;
+        function typeSubtitle() {
+            if (charIdx < subText.length) {
+                typedSubtitle.textContent += subText.charAt(charIdx);
+                charIdx++;
+                setTimeout(typeSubtitle, 35);
+            }
+        }
+        setTimeout(typeSubtitle, 400);
+
+        const nodes = [];
+        const nodeCount = 75;
+        const codeSnippets = ["01", "{}", "=>", "if()", "&&", "0x1A", "fn()", "[]"];
+
+        for (let i = 0; i < nodeCount; i++) {
+            nodes.push({
+                x: Math.random() * cWidth,
+                y: Math.random() * cHeight,
+                vx: (Math.random() - 0.5) * 0.9,
+                vy: (Math.random() - 0.5) * 0.9,
+                label: Math.random() > 0.7 ? codeSnippets[Math.floor(Math.random() * codeSnippets.length)] : null
+            });
+        }
+
+        let mouse = { x: -1000, y: -1000 };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        function animateCyberGrid() {
+            if (!introActive) return;
+
+            cCtx.clearRect(0, 0, cWidth, cHeight);
+            cCtx.font = "11px 'Fira Code', monospace";
+
+            for (let i = 0; i < nodes.length; i++) {
+                const n = nodes[i];
+                n.x += n.vx;
+                n.y += n.vy;
+
+                if (n.x < 0 || n.x > cWidth) n.vx *= -1;
+                if (n.y < 0 || n.y > cHeight) n.vy *= -1;
+
+                cCtx.fillStyle = "rgba(0, 255, 170, 0.75)";
+                cCtx.beginPath();
+                cCtx.arc(n.x, n.y, 2, 0, Math.PI * 2);
+                cCtx.fill();
+
+                if (n.label) {
+                    cCtx.fillStyle = "rgba(56, 189, 248, 0.45)";
+                    cCtx.fillText(n.label, n.x + 6, n.y + 4);
+                }
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const n2 = nodes[j];
+                    const dist = Math.hypot(n.x - n2.x, n.y - n2.y);
+                    if (dist < 140) {
+                        cCtx.strokeStyle = `rgba(0, 255, 170, ${(1 - dist / 140) * 0.25})`;
+                        cCtx.lineWidth = 1;
+                        cCtx.beginPath();
+                        cCtx.moveTo(n.x, n.y);
+                        cCtx.lineTo(n2.x, n2.y);
+                        cCtx.stroke();
+                    }
+                }
+
+                const mouseDist = Math.hypot(n.x - mouse.x, n.y - mouse.y);
+                if (mouseDist < 170) {
+                    cCtx.strokeStyle = `rgba(56, 189, 248, ${(1 - mouseDist / 170) * 0.5})`;
+                    cCtx.beginPath();
+                    cCtx.moveTo(n.x, n.y);
+                    cCtx.lineTo(mouse.x, mouse.y);
+                    cCtx.stroke();
+                }
+            }
+
+            requestAnimationFrame(animateCyberGrid);
+        }
+
+        animateCyberGrid();
+
+        /* =========================================================
+           GEÇİŞ: GİRİŞ -> "EGE SUNAR" -> 2. EKRAN (KOD AKADEMİSİ)
+           ========================================================= */
+        const egeSplash = document.getElementById('ege-splash');
+        const bootLogs = document.getElementById('bootLogs');
+        const splashBar = document.getElementById('splashBar');
+        const mainApp = document.getElementById('main-app');
+        let transitionStarted = false;
+
+        function startSystemSequence() {
+            if (transitionStarted) return;
+            transitionStarted = true;
+
+            introScreen.classList.add('fade-out');
+            splashBar.style.width = '0%';
+            bootLogs.innerHTML = '';
+            egeSplash.classList.add('show');
+
+            const logLines = [
+                '&gt; Initializing AEGEAN_KERNEL_v3.0...',
+                '&gt; Mounting compilers: [Python, JavaScript, HTML5, C++] ... OK',
+                '&gt; Booting EGE_AI_ASSISTANT neural core ... READY',
+                '&gt; Launching step-by-step interactive code studio...'
+            ];
+
+            logLines.forEach((line, idx) => {
+                setTimeout(() => {
+                    bootLogs.innerHTML += line + '<br>';
+                }, idx * 420);
+            });
+
+            setTimeout(() => {
+                splashBar.style.width = '100%';
+            }, 100);
+
+            setTimeout(() => {
+                introActive = false;
+                introScreen.style.display = 'none';
+                egeSplash.classList.remove('show');
+                mainApp.classList.add('active');
+                startMainMatrix();
+                loadLesson();
+            }, 2600);
+        }
+
+        enterBtn.addEventListener('click', startSystemSequence);
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && introActive) {
+                startSystemSequence();
+            }
+        });
+
+        /* =========================================================
+           2. BÖLÜM SCRIPT: YUKARIDAN SONSUZ AKAN KOD YAĞMURU
+           ========================================================= */
+        const matrixCanvas = document.getElementById('matrix-bg');
+        const mCtx = matrixCanvas.getContext('2d');
+        let mWidth, mHeight, mColumns, mDrops;
+        const mChars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン<>{}[]();=+-*/&%$#@!";
+        const mFontSize = 15;
+
+        function startMainMatrix() {
+            mWidth = matrixCanvas.width = window.innerWidth;
+            mHeight = matrixCanvas.height = window.innerHeight;
+            mColumns = Math.floor(mWidth / mFontSize);
+            mDrops = Array.from({ length: mColumns }, () => Math.random() * -100);
+            animateMatrix();
+        }
+
+        function animateMatrix() {
+            mCtx.fillStyle = 'rgba(2, 3, 6, 0.08)';
+            mCtx.fillRect(0, 0, mWidth, mHeight);
+
+            mCtx.font = mFontSize + "px 'Fira Code', monospace";
+
+            for (let i = 0; i < mDrops.length; i++) {
+                const char = mChars[Math.floor(Math.random() * mChars.length)];
+                mCtx.fillStyle = Math.random() > 0.94 ? '#ffffff' : '#00ffaa';
+                mCtx.fillText(char, i * mFontSize, mDrops[i] * mFontSize);
+
+                if (mDrops[i] * mFontSize > mHeight && Math.random() > 0.975) {
+                    mDrops[i] = 0;
+                }
+                mDrops[i]++;
+            }
+            requestAnimationFrame(animateMatrix);
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').textContent = `SYS: ${now.toLocaleTimeString('tr-TR')}`;
+        }, 1000);
+
+        /* =========================================================
+           3. BÖLÜM SCRIPT: ADIM ADIM KODLAMA AKADEMİSİ
+           ========================================================= */
+        const lessonsData = {
+            python: {
+                file: 'ege_akademi.py',
+                steps: [
+                    {
+                        title: '1. Adım: Ekrana Yazı Yazdırma (print)',
+                        desc: 'Python’da bilgisayara ekranda yazı göstertmek için print() komutu kullanılır. Yazacağın metni mutlaka çift tırnak (" ") içine almalısın.',
+                        mission: 'Aşağıdaki koda ikinci bir print() satırı ekleyerek ekrana "Ege" kelimesini de yazdır ve çalıştır.',
+                        tip: 'İpucu: Alt satıra print("Ege") yazıp ÇALIŞTIR & KONTROL ET butonuna bas.',
+                        starterCode: 'print("Welcome to the imagination of the Aegean")\n# Alt satıra kendi print kodunu yaz:\n',
+                        solutionCode: 'print("Welcome to the imagination of the Aegean")\nprint("Ege")',
+                        validate: (code) => /print\s*\(\s*["'].*ege.*["']\s*\)/i.test(code),
+                        successMsg: 'Harika! print() fonksiyonunu başarıyla kullandın. [+50 XP]'
+                    },
+                    {
+                        title: '2. Adım: Değişken Tanımlama',
+                        desc: 'Değişkenler verileri hafızada tutan etiketlerdir. Örneğin seviye = 99 yazdığımızda "seviye" değişkeni artık 99 sayısını temsil eder.',
+                        mission: 'seviye adında bir değişken oluştur, değerini bir sayı yap ve print(seviye) ile ekrana yazdır.',
+                        tip: 'İpucu: Sayıları tırnak içine almadan doğrudan seviye = 99 şeklinde yazabilirsin.',
+                        starterCode: 'oyuncu = "Ege"\n# seviye değişkenini oluştur ve yazdır:\n',
+                        solutionCode: 'oyuncu = "Ege"\nseviye = 99\nprint(oyuncu)\nprint(seviye)',
+                        validate: (code) => /seviye\s*=\s*\d+/.test(code) && /print\s*\(\s*seviye\s*\)/.test(code),
+                        successMsg: 'Mükemmel! Değişken tanımlama ve çağırma mantığını kavradın. [+50 XP]'
+                    },
+                    {
+                        title: '3. Adım: Karar Yapıları (if - else)',
+                        desc: 'Programların şartlara göre karar vermesi için if (eğer) ve else (değilse) blokları kullanılır.',
+                        mission: 'enerji değişkenini 80 yap. Eğer enerji > 50 ise ekrana "Saldiri Hazir" yazdıran if koşulunu tamamla.',
+                        tip: 'İpucu: if enerji > 50: satırından sonra alt satırı 4 boşluk içeriden yazmayı unutma!',
+                        starterCode: 'enerji = 80\nif enerji > 50:\n    # Buraya print komutunu yaz\n',
+                        solutionCode: 'enerji = 80\nif enerji > 50:\n    print("Saldiri Hazir")',
+                        validate: (code) => /if\s+enerji\s*>\s*50\s*:/.test(code) && /print\s*\(/.test(code),
+                        successMsg: 'Süper! Artık kodların kendi başına karar verebiliyor. [+50 XP]'
+                    },
+                    {
+                        title: '4. Adım: Döngüler (for Döngüsü)',
+                        desc: 'Aynı işlemi defalarca tekrar etmek için for döngüsü kullanılır. range(5) komutu kodu 5 kez döndürür.',
+                        mission: 'for i in range(5): döngüsünün içine her turda i değerini ekrana yazdıran print(i) kodunu ekle.',
+                        tip: 'İpucu: Döngü içindeki kodun girintili (içeride) olmasına dikkat et.',
+                        starterCode: 'for i in range(5):\n    # i değişkenini yazdır:\n',
+                        solutionCode: 'for i in range(5):\n    print(i)',
+                        validate: (code) => /for\s+i\s+in\s+range\s*\(\s*5\s*\)\s*:/.test(code) && /print\s*\(\s*i\s*\)/.test(code),
+                        successMsg: 'Tebrikler! Döngüleri başarıyla kurdun. [+50 XP]'
+                    },
+                    {
+                        title: '5. Adım: Kendi Fonksiyonunu Yaz (def)',
+                        desc: 'Fonksiyonlar tekrar kullanabileceğin özel yeteneklerdir. Python’da def anahtar kelimesiyle tanımlanır.',
+                        mission: 'selamla() fonksiyonunu tanımla ve en alt satırda selamla() yazarak fonksiyonu çağır.',
+                        tip: 'İpucu: Fonksiyonu tanımlamak tek başına çalıştırmaz; en altta adını yazıp parantez açıp kapatmalısın.',
+                        starterCode: 'def selamla():\n    print("Aegean Core Sistemine Hoş Geldin!")\n\n# Fonksiyonu aşağıda çağır:\n',
+                        solutionCode: 'def selamla():\n    print("Aegean Core Sistemine Hoş Geldin!")\n\nselamla()',
+                        validate: (code) => /def\s+selamla\s*\(\s*\)\s*:/.test(code) && (code.match(/selamla\s*\(\s*\)/g) || []).length >= 2,
+                        successMsg: 'EFSANE! Python Eğitim Modülünü %100 tamamladın! [+100 XP]'
+                    }
+                ]
+            },
+            javascript: {
+                file: 'sistem.js',
+                steps: [
+                    {
+                        title: '1. Adım: Konsola Çıktı Verme (console.log)',
+                        desc: 'JavaScript web sitelerini canlandıran dildir. Geliştirici terminaline mesaj yazmak için console.log() kullanılır.',
+                        mission: 'console.log() kullanarak konsola "Ege" içeren bir mesaj yazdır.',
+                        tip: 'İpucu: Yazdığın JavaScript kodları tarayıcı motorunda gerçek zamanlı çalıştırılır!',
+                        starterCode: 'console.log("Sistem Başlatılıyor...");\n// Alt satıra kendi mesajını yaz:\n',
+                        solutionCode: 'console.log("Sistem Başlatılıyor...");\nconsole.log("Coder Ege Aktif!");',
+                        validate: (code) => /console\.log\s*\(.*ege.*\)/i.test(code),
+                        successMsg: 'Harika! JavaScript motorunda ilk kodunu çalıştırdın. [+50 XP]'
+                    },
+                    {
+                        title: '2. Adım: const ve let Değişkenleri',
+                        desc: 'Modern JavaScript’te sabitler için const, değişebilen değerler için let kullanılır.',
+                        mission: 'let skor = 100; tanımla ve console.log(skor); ile ekrana yazdır.',
+                        tip: 'İpucu: Satır sonlarına noktalı virgül (;) koymak iyi bir alışkanlıktır.',
+                        starterCode: 'const mod = "Siber";\n// skor değişkenini tanımla ve yazdır:\n',
+                        solutionCode: 'const mod = "Siber";\nlet skor = 100;\nconsole.log(skor);',
+                        validate: (code) => /let\s+skor\s*=\s*\d+/.test(code) && /console\.log\s*\(\s*skor\s*\)/.test(code),
+                        successMsg: 'Süper! Değişkenler belleğe başarıyla işlendi. [+50 XP]'
+                    },
+                    {
+                        title: '3. Adım: Koşul Kontrolü (if)',
+                        desc: 'JavaScript’te koşullar parantez () içine, çalışacak kodlar ise süslü parantez { } içine yazılır.',
+                        mission: 'hiz değişkeni 100’den büyükse console.log("Turbo Aktif") yazdıran if bloğunu tamamla.',
+                        tip: 'İpucu: if (hiz > 100) { console.log("Turbo Aktif"); }',
+                        starterCode: 'let hiz = 150;\nif (hiz > 100) {\n    // Buraya konsol çıktısı ekle\n}',
+                        solutionCode: 'let hiz = 150;\nif (hiz > 100) {\n    console.log("Turbo Aktif");\n}',
+                        validate: (code) => /if\s*\(\s*hiz\s*>\s*100\s*\)/.test(code) && /console\.log/.test(code),
+                        successMsg: 'Mükemmel! Koşul bloğu hatasız çalıştı. [+50 XP]'
+                    },
+                    {
+                        title: '4. Adım: Fonksiyon Oluşturma',
+                        desc: 'function anahtar kelimesiyle kendi komutlarını üretebilirsin.',
+                        mission: 'topla(5, 10) fonksiyonunu çağırarak sonucu console.log ile ekrana yazdır.',
+                        tip: 'İpucu: console.log(topla(5, 10)); yazarak sonucu görebilirsin.',
+                        starterCode: 'function topla(a, b) {\n    return a + b;\n}\n// Fonksiyonu çağır ve yazdır:\n',
+                        solutionCode: 'function topla(a, b) {\n    return a + b;\n}\nconsole.log(topla(5, 10));',
+                        validate: (code) => /topla\s*\(\s*\d+\s*,\s*\d+\s*\)/.test(code) && /console\.log/.test(code),
+                        successMsg: 'Tebrikler! JavaScript modülünü tamamladın! [+100 XP]'
+                    }
+                ]
+            },
+            html: {
+                file: 'index.html',
+                steps: [
+                    {
+                        title: '1. Adım: Ana Başlık Oluşturma (<h1>)',
+                        desc: 'HTML web sayfalarının yapı taşıdır. En büyük ana başlık için <h1> etiketi kullanılır ve </h1> ile kapatılır.',
+                        mission: '<h1> etiketleri arasına "AEGEAN CORE" yazarak sayfana bir başlık ekle.',
+                        tip: 'İpucu: <h1>AEGEAN CORE</h1> şeklinde yazmalısın.',
+                        starterCode: '<!-- Aşağıya h1 başlığını yaz -->\n<h1></h1>',
+                        solutionCode: '<h1>AEGEAN CORE</h1>',
+                        validate: (code) => /<h1>.*aegean.*<\/h1>/i.test(code),
+                        successMsg: 'Harika! İlk HTML başlığın tarayıcıda oluşturuldu. [+50 XP]'
+                    },
+                    {
+                        title: '2. Adım: Etkileşimli Buton (<button>)',
+                        desc: 'Kullanıcıların tıklayabileceği butonlar yapmak için <button> etiketi kullanılır.',
+                        mission: '<button>Sisteme Gir</button> etiketini yazarak bir buton oluştur.',
+                        tip: 'İpucu: Açılış ve kapanış etiketlerini eksiksiz yaz.',
+                        starterCode: '<h1>AEGEAN CORE</h1>\n<!-- Alt satıra buton ekle -->\n',
+                        solutionCode: '<h1>AEGEAN CORE</h1>\n<button>Sisteme Gir</button>',
+                        validate: (code) => /<button>.*<\/button>/i.test(code),
+                        successMsg: 'Süper! Butonun sahneye eklendi. [+50 XP]'
+                    },
+                    {
+                        title: '3. Adım: CSS ile Neon Stil Verme',
+                        desc: 'Etiketlerin içine style="..." ekleyerek renklerini değiştirebilirsin.',
+                        mission: 'Başlığın rengini neon yeşil yapmak için style="color: #00ffaa;" özelliğini ekle.',
+                        tip: 'İpucu: <h1 style="color: #00ffaa;">AEGEAN CORE</h1>',
+                        starterCode: '<h1 style="color: ">AEGEAN CORE</h1>',
+                        solutionCode: '<h1 style="color: #00ffaa;">AEGEAN CORE</h1>',
+                        validate: (code) => /style\s*=\s*["'].*color\s*:\s*#00ffaa/i.test(code),
+                        successMsg: 'Mükemmel! Web sayfana siber neon rengini verdin! [+100 XP]'
+                    }
+                ]
+            },
+            cpp: {
+                file: 'engine.cpp',
+                steps: [
+                    {
+                        title: '1. Adım: C++ Standart Çıktı (cout)',
+                        desc: 'C++ yüksek performanslı oyunların dilidir. Ekrana yazı yazmak için cout << "metin"; kullanılır.',
+                        mission: 'cout << "Ege"; komutunu yazarak ekrana ismini yazdır.',
+                        tip: 'İpucu: C++’ta her satırın sonuna noktalı virgül (;) koymayı sakın unutma!',
+                        starterCode: '#include <iostream>\nusing namespace std;\n\nint main() {\n    // Buraya cout komutunu yaz:\n    \n    return 0;\n}',
+                        solutionCode: '#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Ege";\n    return 0;\n}',
+                        validate: (code) => /cout\s*<<\s*["'].*ege.*["']\s*;/i.test(code),
+                        successMsg: 'Harika! C++ derleyicisi kodunu başarıyla işledi. [+50 XP]'
+                    },
+                    {
+                        title: '2. Adım: Tam Sayı Değişkeni (int)',
+                        desc: 'C++’ta tam sayıları saklamak için değişkenin başına int yazılır.',
+                        mission: 'int fps = 240; değişkenini oluştur ve cout << fps; ile ekrana yazdır.',
+                        tip: 'İpucu: int fps = 240; ardından cout << fps;',
+                        starterCode: 'int main() {\n    // fps değişkenini tanımla ve yazdır:\n    \n    return 0;\n}',
+                        solutionCode: 'int main() {\n    int fps = 240;\n    cout << fps;\n    return 0;\n}',
+                        validate: (code) => /int\s+fps\s*=\s*\d+\s*;/.test(code) && /cout\s*<<\s*fps\s*;/.test(code),
+                        successMsg: 'Süper! C++ temel veri tiplerini öğrendin! [+100 XP]'
+                    }
+                ]
+            }
+        };
+
+        let currentLang = 'python';
+        let currentStepIndex = 0;
+        let totalXP = 0;
+        let completedSteps = {};
+
+        const langBtns = document.querySelectorAll('.lang-btn');
+        const xpBadge = document.getElementById('xpBadge');
+        const stepProgressBar = document.getElementById('stepProgressBar');
+        const stepIndicator = document.getElementById('stepIndicator');
+        const stepStatusTag = document.getElementById('stepStatusTag');
+        const lessonTitle = document.getElementById('lessonTitle');
+        const lessonDesc = document.getElementById('lessonDesc');
+        const missionText = document.getElementById('missionText');
+        const lessonTip = document.getElementById('lessonTip');
+        const editorFileName = document.getElementById('editorFileName');
+        const codeEditorArea = document.getElementById('codeEditorArea');
+        const consoleResult = document.getElementById('consoleResult');
+        const prevStepBtn = document.getElementById('prevStepBtn');
+        const nextStepBtn = document.getElementById('nextStepBtn');
+        const runCodeBtn = document.getElementById('runCodeBtn');
+        const resetCodeBtn = document.getElementById('resetCodeBtn');
+        const solveCodeBtn = document.getElementById('solveCodeBtn');
+
+        function renderProgressBar() {
+            const steps = lessonsData[currentLang].steps;
+            stepProgressBar.innerHTML = '';
+            steps.forEach((_, idx) => {
+                const pill = document.createElement('div');
+                pill.className = 'step-pill';
+                const key = `${currentLang}-${idx}`;
+                if (completedSteps[key]) pill.classList.add('done');
+                else if (idx === currentStepIndex) pill.classList.add('current');
+                stepProgressBar.appendChild(pill);
+            });
+        }
+
+        function loadLesson() {
+            const langObj = lessonsData[currentLang];
+            const step = langObj.steps[currentStepIndex];
+            const key = `${currentLang}-${currentStepIndex}`;
+            const isDone = !!completedSteps[key];
+
+            stepIndicator.textContent = `ADIM ${currentStepIndex + 1} / ${langObj.steps.length}`;
+            lessonTitle.textContent = step.title;
+            lessonDesc.textContent = step.desc;
+            missionText.textContent = step.mission;
+            lessonTip.textContent = step.tip;
+            editorFileName.textContent = langObj.file;
+            codeEditorArea.value = isDone ? step.solutionCode : step.starterCode;
+
+            if (isDone) {
+                stepStatusTag.textContent = '✓ GÖREV TAMAMLANDI';
+                stepStatusTag.classList.add('completed');
+            } else {
+                stepStatusTag.textContent = 'GÖREV BEKLENİYOR';
+                stepStatusTag.classList.remove('completed');
+            }
+
+            consoleResult.style.color = '#00ffaa';
+            consoleResult.textContent = "Görevi tamamla ve 'ÇALIŞTIR & KONTROL ET' butonuna bas...";
+
+            prevStepBtn.disabled = currentStepIndex === 0;
+            nextStepBtn.disabled = currentStepIndex === langObj.steps.length - 1;
+            renderProgressBar();
+        }
+
+        langBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                langBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentLang = btn.getAttribute('data-lang');
+                currentStepIndex = 0;
+                loadLesson();
+            });
+        });
+
+        prevStepBtn.addEventListener('click', () => {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                loadLesson();
+            }
+        });
+
+        nextStepBtn.addEventListener('click', () => {
+            const max = lessonsData[currentLang].steps.length - 1;
+            if (currentStepIndex < max) {
+                currentStepIndex++;
+                loadLesson();
+            }
+        });
+
+        resetCodeBtn.addEventListener('click', () => {
+            const step = lessonsData[currentLang].steps[currentStepIndex];
+            codeEditorArea.value = step.starterCode;
+            consoleResult.style.color = '#94a3b8';
+            consoleResult.textContent = 'Kod başlangıç haline sıfırlandı.';
+        });
+
+        solveCodeBtn.addEventListener('click', () => {
+            const step = lessonsData[currentLang].steps[currentStepIndex];
+            codeEditorArea.value = step.solutionCode;
+            consoleResult.style.color = '#38bdf8';
+            consoleResult.textContent = 'Örnek çözüm editöre yüklendi. Şimdi ÇALIŞTIR butonuna basabilirsin.';
+        });
+
+        runCodeBtn.addEventListener('click', () => {
+            const userCode = codeEditorArea.value;
+            const step = lessonsData[currentLang].steps[currentStepIndex];
+            const key = `${currentLang}-${currentStepIndex}`;
+
+            let outputText = '';
+
+            if (currentLang === 'javascript') {
+                let logs = [];
+                const originalLog = console.log;
+                console.log = (...args) => logs.push(args.join(' '));
+                try {
+                    eval(userCode);
+                    outputText = logs.length > 0 ? logs.join('\n') : '(Çıktı üretilmedi)';
+                } catch (err) {
+                    consoleResult.style.color = '#ff4d4d';
+                    consoleResult.textContent = '[SÖZDİZİMİ HATASI]: ' + err.message;
+                    return;
+                }
+                console.log = originalLog;
+            } else if (currentLang === 'python') {
+                const printMatches = [...userCode.matchAll(/print\s*\((.*?)\)/g)];
+                if (printMatches.length > 0) {
+                    outputText = printMatches.map(m => m[1].replace(/["']/g, '')).join('\n');
+                } else {
+                    outputText = '(Ekrana herhangi bir print çıktısı verilmedi)';
+                }
+            } else if (currentLang === 'html') {
+                outputText = '[HTML RENDER BAŞARILI]:\n' + userCode.trim();
+            } else if (currentLang === 'cpp') {
+                const coutMatches = [...userCode.matchAll(/cout\s*<<\s*(.*?)\s*;/g)];
+                outputText = coutMatches.length > 0
+                    ? coutMatches.map(m => m[1].replace(/["']/g, '')).join('\n')
+                    : '(Derlendi fakat cout çıktısı bulunamadı)';
+            }
+
+            const passed = step.validate(userCode);
+
+            if (passed) {
+                if (!completedSteps[key]) {
+                    completedSteps[key] = true;
+                    totalXP += 50;
+                    xpBadge.textContent = `⚡ XP: ${totalXP}`;
+                }
+                stepStatusTag.textContent = '✓ GÖREV TAMAMLANDI';
+                stepStatusTag.classList.add('completed');
+                renderProgressBar();
+
+                consoleResult.style.color = '#00ffaa';
+                consoleResult.textContent = `${outputText}\n\n✔ ${step.successMsg}`;
+            } else {
+                consoleResult.style.color = '#ffbd2e';
+                consoleResult.textContent = `${outputText}\n\n⚠ [GÖREV HENÜZ TAMAMLANMADI]: Sol taraftaki görevi kontrol et veya 'Çözümü Yaz' butonundan yardım al.`;
+            }
+        });
+
+        /* =========================================================
+           4. BÖLÜM SCRIPT: YAN TARAF EGE'NİN AI ASİSTANI
+           ========================================================= */
+        const connectAssistantBtn = document.getElementById('connectAssistantBtn');
+        const assistantSidebar = document.getElementById('assistantSidebar');
+        const closeAssistantBtn = document.getElementById('closeAssistantBtn');
+        const aiChatBody = document.getElementById('aiChatBody');
+        const aiUserInput = document.getElementById('aiUserInput');
+        const aiSendBtn = document.getElementById('aiSendBtn');
+        const quickChips = document.querySelectorAll('.quick-chip');
+
+        let assistantGreeted = false;
+
+        function appendAiBubble(text, sender = 'bot') {
+            const div = document.createElement('div');
+            div.className = `msg-bubble ${sender}`;
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            aiChatBody.appendChild(div);
+            aiChatBody.scrollTop = aiChatBody.scrollHeight;
+        }
+
+        connectAssistantBtn.addEventListener('click', () => {
+            const isOpen = assistantSidebar.classList.toggle('open');
+            connectAssistantBtn.classList.toggle('connected', isOpen);
+
+            if (isOpen && !assistantGreeted) {
+                assistantGreeted = true;
+                appendAiBubble("🔗 <b>Bağlantı Kuruldu!</b><br>Ege'nin asistanıyla konuşuyorsun. Nasıl yardımcı olabilirim?", 'bot');
+            }
+            if (isOpen) aiUserInput.focus();
+        });
+
+        closeAssistantBtn.addEventListener('click', () => {
+            assistantSidebar.classList.remove('open');
+            connectAssistantBtn.classList.remove('connected');
+        });
+
+        // Akıllı Cevap Motoru
+        function generateSmartReply(rawQuestion) {
+            const q = rawQuestion.toLowerCase().trim();
+            const currentStep = lessonsData[currentLang].steps[currentStepIndex];
+
+            // 1. Selamlaşma
+            if (/^(selam|merhaba|slm|sa|naber|nasılsın|hey)\b/.test(q)) {
+                return "Selam! Ben Ege'nin özel yapay zeka asistanıyım. Kodlama derslerinde takıldığın yerleri, matematik sorularını veya merak ettiğin her şeyi sorabilirsin!";
+            }
+
+            // 2. Kimlik
+            if (q.includes("kimsin") || q.includes("adın ne") || q.includes("seni kim yaptı")) {
+                return "Ben <b>Ege AI Asistan</b>. Ege tarafından tasarlanan bu siber kodlama platformunda sana rehberlik etmek ve sorularını çözmek için buradayım.";
+            }
+
+            // 3. Mevcut dersteki göreve yardım
+            if (q.includes("görev") || q.includes("yardım") || q.includes("nasıl yaparım") || q.includes("çözüm") || q.includes("bu adım")) {
+                return `Şu an <b>${currentLang.toUpperCase()}</b> dilinde <b>${currentStep.title}</b> aşamasındasın.<br><br><b>Yapman gereken:</b> ${currentStep.mission}<br><br><b>Örnek Kod:</b><br><code style="color:#00ffaa;">${currentStep.solutionCode.replace(/\n/g, '<br>')}</code>`;
+            }
+
+            // 4. Matematik hesaplama motoru (ör: 125 * 48 kaç eder?)
+            const mathMatch = q.match(/(\d+(?:\.\d+)?)\s*([\+\-\*\/x×÷])\s*(\d+(?:\.\d+)?)/);
+            if (mathMatch) {
+                const a = parseFloat(mathMatch[1]);
+                const op = mathMatch[2];
+                const b = parseFloat(mathMatch[3]);
+                let res = 0;
+                if (op === '+') res = a + b;
+                else if (op === '-') res = a - b;
+                else if (op === '*' || op === 'x' || op === '×') res = a * b;
+                else if (op === '/' || op === '÷') res = b !== 0 ? (a / b).toFixed(2) : "Sıfıra bölünemez!";
+                return `🧮 Hesaplama Sonucu: <b>${a} ${op} ${b} = ${res}</b>`;
+            }
+
+            // 5. Programlama dilleri & kavramları
+            if (q.includes("python")) {
+                return "🐍 <b>Python:</b> Okunması en kolay ve en güçlü dillerden biridir. Yapay zeka, veri bilimi, Discord botları ve backend sistemlerinde kullanılır. Ekrana yazı yazmak için <code>print(\"metin\")</code> kullanılır.";
+            }
+            if (q.includes("javascript") || q.includes("js")) {
+                return "⚡ <b>JavaScript:</b> Web sitelerini interaktif ve hareketli yapan dildir. Şu an gördüğün bu sitenin tüm animasyonları ve benim zekam JavaScript ile çalışıyor!";
+            }
+            if (q.includes("html") || q.includes("css")) {
+                return "🌐 <b>HTML & CSS:</b> HTML web sitesinin iskeletini (başlık, buton, yazı), CSS ise renklerini, neon ışıklarını ve tasarımını oluşturur.";
+            }
+            if (q.includes("c++")) {
+                return "⚙️ <b>C++:</b> Donanıma en yakın, ultra hızlı programlama dilidir. Büyük 3D oyun motorları (Unreal Engine) ve yüksek performanslı sistemler C++ ile yazılır.";
+            }
+            if (q.includes("değişken") || q.includes("variable")) {
+                return "📦 <b>Değişken (Variable):</b> Bilgisayarın hafızasında veri saklayan kutulardır. Örneğin <code>skor = 100</code> yazdığında skor kutusunun içine 100 koymuş olursun.";
+            }
+            if (q.includes("döngü") || q.includes("for") || q.includes("while")) {
+                return "🔄 <b>Döngü (Loop):</b> Bir kodu onlarca kez tekrar yazmak yerine belirli bir şart veya sayı kadar otomatik döndüren yapıdır.";
+            }
+            if (q.includes("vs code") || q.includes("visual studio")) {
+                return "💻 <b>VS Code İpucu:</b> Kodunu hızlıca test etmek için <b>Live Server</b> eklentisini kurabilir, satırları otomatik düzenlemek için <code>Shift + Alt + F</code> kısayolunu kullanabilirsin.";
+            }
+
+            // 6. Genel kültür / Türkiye / Bilim soruları
+            if (q.includes("türkiye") && q.includes("başkent")) {
+                return "🇹🇷 Türkiye'nin başkenti <b>Ankara</b>'dır.";
+            }
+            if (q.includes("saat kaç") || q.includes("tarih")) {
+                const now = new Date();
+                return `🕒 Şu an yerel saat: <b>${now.toLocaleTimeString('tr-TR')}</b> — Tarih: <b>${now.toLocaleDateString('tr-TR')}</b>`;
+            }
+            if (q.includes("xp") || q.includes("puan")) {
+                return `⚡ Şu an toplam <b>${totalXP} XP</b> puanın var. Her adımdaki görevi tamamlayıp 'ÇALIŞTIR & KONTROL ET' dediğinde +50 XP kazanırsın!`;
+            }
+
+            // 7. Genel akıllı yanıt
+            return `Sorunu analiz ettim: <b>"${rawQuestion}"</b>.<br>Bu konuda sana hemen yardımcı olabilirim: Eğer kodlama ile ilgiliyse sol taraftaki editörde uygulayabilir, veya mevcut dersin çözümü için <b>"Bu göreve yardım et"</b> yazabilirsin!`;
+        }
+
+        function sendAiQuestion(customText = null) {
+            const text = customText || aiUserInput.value.trim();
+            if (!text) return;
+
+            appendAiBubble(text, 'user');
+            if (!customText) aiUserInput.value = '';
+
+            // Yazıyor... efekti ve cevap
+            const typingId = 'typing-' + Date.now();
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'msg-bubble bot';
+            typingDiv.id = typingId;
+            typingDiv.innerHTML = '<span style="color:#00f0ff;">Analiz ediliyor...</span>';
+            aiChatBody.appendChild(typingDiv);
+            aiChatBody.scrollTop = aiChatBody.scrollHeight;
+
+            setTimeout(() => {
+                const el = document.getElementById(typingId);
+                if (el) el.remove();
+                const reply = generateSmartReply(text);
+                appendAiBubble(reply, 'bot');
+            }, 450);
+        }
+
+        aiSendBtn.addEventListener('click', () => sendAiQuestion());
+        aiUserInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendAiQuestion();
+        });
+
+        quickChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                sendAiQuestion(chip.getAttribute('data-q'));
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            if (introActive) {
+                cWidth = cyberCanvas.width = window.innerWidth;
+                cHeight = cyberCanvas.height = window.innerHeight;
+            }
+            if (mainApp.classList.contains('active')) {
+                mWidth = matrixCanvas.width = window.innerWidth;
+                mHeight = matrixCanvas.height = window.innerHeight;
+            }
+        });
+    </script>
+</body>
+</html>
